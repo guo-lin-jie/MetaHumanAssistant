@@ -1,0 +1,20 @@
+[project]
+name = "4"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "baidu-aip==4.16.13",
+    "chardet>=7.4.3",
+    "fastapi==0.115.0",
+    "langchain==0.3.0",
+    "langchain-openai==0.2.0",
+    "python-dotenv==1.0.1",
+    "python-multipart==0.0.9",
+    "uvicorn==0.30.0",
+]
+
+[[tool.uv.index]]
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+default = true

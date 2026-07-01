@@ -1,0 +1,60 @@
+# Environment (contains real API keys — DO NOT commit)
+.env
+*.env
+*.env.local
+config/local_settings.py
+
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+wheels/
+*.egg-info
+*.log
+*.tmp
+
+# Virtual environments
+.venv
+venv/
+env/
+
+# Node.js
+node_modules/
+web/node_modules/
+
+# Build output
+dist/
+web/dist/
+web/.vite/
+web/.cache/
+
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
+
+# 项目业务缓存（音频录音文件夹）
+backend/audio_cache/
+web/data/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Claude Code
+CLAUDE.md
+
+# 其他
+*.bak
+*.tmp
+.cache/
+
+backend/data
+
+docs
