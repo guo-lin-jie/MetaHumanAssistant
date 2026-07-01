@@ -1,103 +1,197 @@
 # 3D 虚拟人语音对话系统
 
-基于 **Vue 3 + Three.js + FastAPI** 构建的 3D 虚拟人交互助手，支持语音识别、流式对话、语音合成，并带有历史会话管理和智能上下文压缩功能。
+**Vue3 \+ Three\.js \+ FastAPI 沉浸式 AI 虚拟语音助手**
+
+✅ 3D 虚拟人渲染 ✅ 实时语音对话 ✅ LLM 流式回复 ✅ 智能上下文压缩 ✅ 完整会话管理
+
+---
+
+## 📌 项目简介
+
+本项目是一款**全息科技风 3D 虚拟人语音交互系统**，基于 Vue3 \+ Three\.js \+ FastAPI 全栈开发。整合百度语音识别/合成、主流大模型对话能力，实现沉浸式语音交互、动态虚拟人渲染、长对话智能优化，开箱即用，适合个人演示、AI 交互demo、智能助手落地场景。
+
+---
 
 ## ✨ 核心功能
 
-- 🎤 **语音交互** – 按住说话，自动识别，AI 流式回复（打字机效果）
-- 👤 **3D 虚拟人** – Three.js 渲染，呼吸动画、眼球追踪、嘴型同步、拖拽旋转
-- 🔊 **语音合成** – 多音色、音量/语速可调，支持静音
-- 💬 **弹幕显示** – AI 回复以弹幕形式飘过 3D 区域
-- 📚 **会话管理** – 历史对话列表，新建/切换/删除会话，自动生成标题
-- 🗜️ **上下文压缩** – 长对话自动摘要，减少 Token 消耗（基于 LangChain）
-- 👤 **用户系统** – 注册登录，个性化设置本地持久化
+- **🎤 全链路语音交互**
 
-## 🧱 技术栈
+  - 百度 ASR 实时语音转文字，精准识别中文普通话
 
-- **前端**：Vue 3 + TypeScript + Vite + Pinia + Three.js + RecordRTC
-- **后端**：FastAPI + Python 3.12 + SQLite + Uvicorn
-- **AI 服务**：百度 STT/TTS，兼容 OpenAI 接口的 LLM（推荐硅基流动、DeepSeek 等）
+  - 百度 TTS 智能语音播报，支持 4 种音色、0\-9 级音量/语速调节
 
-## 🚀 快速开始
+  - 支持静音开关、语音状态本地持久化记忆
+
+- **💬 LLM 流式智能对话**
+
+  - 基于 SSE 实现打字机逐字流式回复，低延迟交互体验
+
+  - 兼容 OpenAI 接口规范，支持 **硅基流动、DeepSeek、智谱GLM、通义千问** 等主流大模型
+
+- **🤖 3D 虚拟人动态特效**
+
+  - Three\.js 渲染科技风全息虚拟人，极简未来视觉风格
+
+  - 内置呼吸浮动、头部微动、随机眨眼、眼球鼠标跟随
+
+  - 语音嘴型动态同步、光环粒子特效、多轴光影动态效果
+
+  - 支持鼠标拖拽 360° 旋转查看虚拟人
+
+- **📚 完整会话管理系统**
+
+  - 左侧会话侧边栏，支持新建、切换、删除历史对话
+
+  - AI 自动生成会话标题，按时间倒序排序
+
+  - Pinia \+ 浏览器本地持久化，刷新页面数据不丢失
+
+- **🗜️ 工业级上下文优化**
+
+  - 采用 LangChain 官方 `ConversationSummaryBufferMemory` 方案
+
+  - 长对话自动精简压缩历史上下文，节省 70%\+ Token 消耗
+
+  - 短对话零开销、长对话智能优化，兼顾体验与成本
+
+- **🎨 个性化交互体验**
+
+  - AI 回复弹幕悬浮展示，可独立开关
+
+  - 全部用户配置自动本地记忆
+
+  - 简易用户登录注册、个性化参数配置
+
+---
+
+## 🛠️ 技术栈
+
+### 前端
+
+`Vue3 + Vite6 + TypeScript + Three.js + Pinia + RecordRTC`
+
+### 后端
+
+`FastAPI + Python3.12+ + SQLite + LangChain + 百度AI SDK`
+
+---
+
+## 📊 系统架构
+
+- **前端渲染层**：3D虚拟人渲染、语音采集、页面交互、SSE流式数据接收、全局状态管理
+
+- **后端服务层**：提供语音识别/合成、LLM对话、会话管理、用户认证全套 API 服务
+
+- **数据持久层**：轻量 SQLite 数据库，存储用户信息、会话记录、对话摘要数据
+
+- **AI 能力层**：对接主流大模型、百度语音服务，支撑核心智能交互能力
+
+---
+
+## 🚀 快速启动
 
 ### 环境要求
-- Node.js ≥ 18，npm ≥ 9
-- Python ≥ 3.12
 
-### 1. 克隆与安装
-```bash
-git clone <your-repo>
-cd 3d-avatar-chat
+- Node\.js ≥ 18、npm ≥ 9
 
-# 后端
-cd backend
-pip install -r requirements.txt
-cp .env.example .env   # 填入百度语音及 LLM 密钥
+- Python ≥ 3\.12
 
-# 前端
-cd ../web
-npm install
-2. 启动开发服务
-bash
-# 终端1 – 后端
-cd backend
-python -m uvicorn app:app --host 0.0.0.0 --port 8000
+- 支持 WebGL 现代浏览器（Chrome/Edge/Firefox）
 
-# 终端2 – 前端
-cd web
-npm run dev
-访问 http://localhost:5173
+### 1\. 安装依赖
 
-3. 生产部署（可选）
-bash
+```Plain Text
+# 后端依赖
+cd backend && pip install -r requirements.txt
+
+# 前端依赖
+cd web && npm install
+
+```
+
+### 2\. 环境配置
+
+```Plain Text
+# 复制环境变量模板
+cp .env.example .env
+
+```
+
+编辑 `.env` 文件，配置：**百度语音 API 密钥**、**LLM 服务商 API 信息**
+
+### 3\. 本地运行
+
+```Plain Text
+# 启动后端服务 (端口8000)
+cd backend && python -m uvicorn app:app --host 0.0.0.0 --port 8000
+
+# 启动前端服务 (端口5173)
+cd web && npm run dev
+
+```
+
+访问：[http://localhost:5173](http://localhost:5173)
+
+### 4\. 生产部署
+
+```Plain Text
+# 打包前端静态资源
 cd web && npm run build
-# 将 dist 目录静态文件置于后端服务下，或使用 Docker（提供 docker-compose.yml）
-📁 项目结构（核心）
-text
-backend/
-├── app.py                 # FastAPI 主入口
-├── routers/               # 路由（chat, audio, auth）
-├── services/              # STT/TTS/LLM 服务
-├── models/                # 数据库模型
-├── utils/                 # 工具（Result 统一响应）
-└── data/                  # SQLite 数据库文件
 
-web/
-├── src/
-│   ├── api/               # API 调用函数
-│   ├── components/
-│   │   ├── ChatPanel/
-│   │   ├── ControlBar/
-│   │   ├── SessionSidebar/   # 会话侧边栏
-│   │   └── VirtualHuman/     # Three.js 3D 虚拟人
-│   ├── stores/            # Pinia（chat, settings）
-│   ├── composables/       # useAudio 等
-│   └── types/             # TypeScript 类型
-└── public/
-🔌 主要 API 端点
-所有接口统一返回 { code, msg, data } 格式
+# 启动生产服务
+cd backend && python -m uvicorn app:app --host 0.0.0.0 --port 8000
 
-端点	方法	说明
-/auth/register	POST	注册
-/auth/login	POST	登录
-/chat/stream	POST (SSE)	流式对话（主要使用）
-/chat/sessions	GET	获取会话列表
-/chat/sessions/{id}	GET	获取某会话消息
-/chat/sessions/{id}	DELETE	删除会话
-/audio/asr	POST	语音识别（返回文字）
-/audio/tts	GET	语音合成（返回音频流）
-🧠 智能上下文管理
-采用 ConversationSummaryBufferMemory（LangChain 标准方案）
+```
 
-当对话 Token 超过 2000 时，自动摘要早期内容，保留最近对话
+支持 **Docker 一键部署**，执行 `./deploy_docker.sh` 快速上线
 
-显著降低 LLM 成本（节省约 70% Token），摘要额外开销极小
+---
 
-🎮 操作指南
-拖拽虚拟人：按住鼠标左键旋转视角
+## 🔧 推荐免费 LLM 服务商
 
-语音对话：按住麦克风按钮说话，松开后自动识别并回复
+项目完全兼容 OpenAI 接口格式，无需改代码即可切换模型，推荐低成本/免费平台：
 
-切换音色：在设置面板选择（女声/男声/度逍遥/度丫丫）
+- **硅基流动（首选）**：高速 GLM\-5\.2、通义千问模型，免费额度充足，推理速度快
 
-静音/弹幕：控制栏开关，状态自动记忆
+- **DeepSeek**：超长上下文处理能力强，长对话场景稳定性高
+
+- **通义千问**：阿里生态模型，通用对话场景适配性极佳
+
+---
+
+## 📝 API 规范
+
+后端所有通用接口统一返回格式：
+
+```Plain Text
+{
+  "code": 0,      // 0成功 / 非0失败
+  "msg": "success",
+  "data": {}      // 业务数据
+}
+
+```
+
+SSE 流式对话、音频流接口为原生响应，不统一封装。
+
+---
+
+## ❓ 常见问题
+
+- **LLM 对话无响应**：检查 API 密钥、账户余额，切换免费服务商即可解决
+
+- **麦克风权限失效**：需在 `localhost` 或 HTTPS 环境运行，开启浏览器麦克风权限
+
+- **3D 虚拟人不显示**：更新浏览器/显卡驱动，确保设备支持 WebGL
+
+- **会话数据异常**：清空浏览器本地缓存，重启服务自动重建数据库
+
+---
+
+## 📄 开源许可
+
+本项目仅用于 **学习与研究用途**，欢迎 Star、Fork、Issue 与 PR 迭代优化！
+
+**版本**：v2\.0\.0 \| **更新时间**：2026\-07\-01
+
+> （注：部分内容可能由 AI 生成）
