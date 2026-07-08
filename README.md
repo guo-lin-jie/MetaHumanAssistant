@@ -1,6 +1,6 @@
 # 3D 虚拟人语音对话系统
 
-**Vue3 \+ Three\.js \+ FastAPI 沉浸式 AI 虚拟语音助手**
+**Vue3 + Three.js + FastAPI 沉浸式 AI 虚拟语音助手**
 
 ✅ 3D 虚拟人渲染 ✅ 实时语音对话 ✅ LLM 流式回复 ✅ 智能上下文压缩 ✅ 完整会话管理
 
@@ -8,7 +8,7 @@
 
 ## 📌 项目简介
 
-本项目是一款**全息科技风 3D 虚拟人语音交互系统**，基于 Vue3 \+ Three\.js \+ FastAPI 全栈开发。整合百度语音识别/合成、主流大模型对话能力，实现沉浸式语音交互、动态虚拟人渲染、长对话智能优化，开箱即用，适合个人演示、AI 交互demo、智能助手落地场景。
+本项目是一款**全息科技风 3D 虚拟人语音交互系统**，基于 Vue3 + Three.js + FastAPI 全栈开发。整合百度语音识别/合成、主流大模型对话能力，实现沉浸式语音交互、动态虚拟人渲染、长对话智能优化，开箱即用，适合个人演示、AI 交互demo、智能助手落地场景。
 
 ---
 
@@ -18,7 +18,7 @@
 
   - 百度 ASR 实时语音转文字，精准识别中文普通话
 
-  - 百度 TTS 智能语音播报，支持 4 种音色、0\-9 级音量/语速调节
+  - 百度 TTS 智能语音播报，支持 4 种音色、0-9 级音量/语速调节
 
   - 支持静音开关、语音状态本地持久化记忆
 
@@ -30,7 +30,7 @@
 
 - **🤖 3D 虚拟人动态特效**
 
-  - Three\.js 渲染科技风全息虚拟人，极简未来视觉风格
+  - Three.js 渲染科技风全息虚拟人，极简未来视觉风格
 
   - 内置呼吸浮动、头部微动、随机眨眼、眼球鼠标跟随
 
@@ -44,13 +44,17 @@
 
   - AI 自动生成会话标题，按时间倒序排序
 
-  - Pinia \+ 浏览器本地持久化，刷新页面数据不丢失
+  - Pinia + 浏览器本地持久化，刷新页面数据不丢失
 
-- **🗜️ 工业级上下文优化**
+- **🗜️ 智能上下文管理**
 
-  - 采用 LangChain 官方 `ConversationSummaryBufferMemory` 方案
+  - 采用 LangChain `ConversationSummaryBufferMemory` 方案
 
-  - 长对话自动精简压缩历史上下文，节省 70%\+ Token 消耗
+  - 自定义 `SQLiteChatMessageHistory` 对接现有 `messages` 表
+
+  - 自动从数据库加载历史消息、自动保存新对话
+
+  - Token 超过 2000 时自动调用 LLM 生成摘要压缩历史上下文
 
   - 短对话零开销、长对话智能优化，兼顾体验与成本
 
@@ -82,7 +86,7 @@
 
 - **后端服务层**：提供语音识别/合成、LLM对话、会话管理、用户认证全套 API 服务
 
-- **数据持久层**：轻量 SQLite 数据库，存储用户信息、会话记录、对话摘要数据
+- **数据持久层**：轻量 SQLite 数据库，存储用户信息、会话记录、对话消息
 
 - **AI 能力层**：对接主流大模型、百度语音服务，支撑核心智能交互能力
 
@@ -92,55 +96,51 @@
 
 ### 环境要求
 
-- Node\.js ≥ 18、npm ≥ 9
+- Node.js ≥ 18、npm ≥ 9
 
-- Python ≥ 3\.12
+- Python ≥ 3.12
 
 - 支持 WebGL 现代浏览器（Chrome/Edge/Firefox）
 
-### 1\. 安装依赖
+### 1. 安装依赖
 
-```Plain Text
+```bash
 # 后端依赖
 cd backend && pip install -r requirements.txt
 
 # 前端依赖
 cd web && npm install
-
 ```
 
-### 2\. 环境配置
+### 2. 环境配置
 
-```Plain Text
+```bash
 # 复制环境变量模板
 cp .env.example .env
-
 ```
 
 编辑 `.env` 文件，配置：**百度语音 API 密钥**、**LLM 服务商 API 信息**
 
-### 3\. 本地运行
+### 3. 本地运行
 
-```Plain Text
+```bash
 # 启动后端服务 (端口8000)
 cd backend && python -m uvicorn app:app --host 0.0.0.0 --port 8000
 
 # 启动前端服务 (端口5173)
 cd web && npm run dev
-
 ```
 
 访问：[http://localhost:5173](http://localhost:5173)
 
-### 4\. 生产部署
+### 4. 生产部署
 
-```Plain Text
+```bash
 # 打包前端静态资源
 cd web && npm run build
 
 # 启动生产服务
 cd backend && python -m uvicorn app:app --host 0.0.0.0 --port 8000
-
 ```
 
 支持 **Docker 一键部署**，执行 `./deploy_docker.sh` 快速上线
@@ -151,7 +151,7 @@ cd backend && python -m uvicorn app:app --host 0.0.0.0 --port 8000
 
 项目完全兼容 OpenAI 接口格式，无需改代码即可切换模型，推荐低成本/免费平台：
 
-- **硅基流动（首选）**：高速 GLM\-5\.2、通义千问模型，免费额度充足，推理速度快
+- **硅基流动（首选）**：高速 GLM-5.2、通义千问模型，免费额度充足，推理速度快
 
 - **DeepSeek**：超长上下文处理能力强，长对话场景稳定性高
 
@@ -163,13 +163,12 @@ cd backend && python -m uvicorn app:app --host 0.0.0.0 --port 8000
 
 后端所有通用接口统一返回格式：
 
-```Plain Text
+```json
 {
   "code": 0,      // 0成功 / 非0失败
   "msg": "success",
   "data": {}      // 业务数据
 }
-
 ```
 
 SSE 流式对话、音频流接口为原生响应，不统一封装。
@@ -187,4 +186,3 @@ SSE 流式对话、音频流接口为原生响应，不统一封装。
 - **会话数据异常**：清空浏览器本地缓存，重启服务自动重建数据库
 
 ---
-

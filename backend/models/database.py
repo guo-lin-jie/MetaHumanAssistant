@@ -8,6 +8,8 @@ from datetime import datetime
 from typing import Optional, List, Dict, Any
 from contextlib import contextmanager
 import os
+from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
+from langchain_core.chat_history import BaseChatMessageHistory
 
 # 数据库文件路径
 DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "chat_history.db")
@@ -384,3 +386,36 @@ class SummaryManager:
 
 # 初始化数据库
 init_db()
+
+
+class SQLiteChatMessageHistory(BaseChatMessageHistory):
+    """
+    自定义聊天消息历史，使用现有的 messages 表
+    配合 ConversationSummaryBufferMemory 自动管理对话历史
+    """
+
+    def __init__(self, session_id: str):
+        self.session_id = session_id
+
+    @property
+    def messages(self) -> List[BaseMessage]:
+        """获取会话的所有消息（按时间正序）"""
+        messages = MessageManager.get_session_messages(self.session_id)
+        result = []
+        for msg in messages:
+            if msg['role'] == 'user':
+                result.append(HumanMessage(content=msg['content']))
+            elif msg['role'] == 'ai':
+                result.append(AIMessage(content=msg['content']))
+        return result
+
+    def add_message(self, message: BaseMessage) -> None:
+        """添加消息到数据库"""
+        role = "user" if isinstance(message, HumanMessage) else "ai"
+        content = message.content
+        # 不需要手动计算 token，MessageManager 会自动处理
+        MessageManager.add_message(self.session_id, role, content)
+
+    def clear(self) -> None:
+        """清空会话消息"""
+        MessageManager.delete_session_messages(self.session_id)

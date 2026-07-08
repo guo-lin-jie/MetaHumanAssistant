@@ -7,7 +7,7 @@ from langchain_openai import ChatOpenAI
 from langchain.memory import ConversationSummaryBufferMemory
 from langchain.schema import HumanMessage, SystemMessage, AIMessage
 from config.settings import LLM_BASE_URL, LLM_API_KEY, LLM_MODEL_NAME, SYSTEM_PROMPT
-from models.database import SessionManager, MessageManager
+from models.database import SessionManager, MessageManager, SQLiteChatMessageHistory
 from typing import Optional, Dict
 import uuid
 
@@ -28,34 +28,24 @@ _session_memories: Dict[str, ConversationSummaryBufferMemory] = {}
 def _get_or_create_memory(session_id: str, user_id: int = 1) -> ConversationSummaryBufferMemory:
     """
     获取或创建会话内存
-    使用 ConversationSummaryBufferMemory（工业标准方案）
-    
-    特性：
-    - 保留最近的消息直到达到 token 限制
-    - 超出限制时自动将早期消息压缩为摘要
-    - 平衡性能和 Token 效率
+    使用 ConversationSummaryBufferMemory + 自定义 SQLiteChatMessageHistory（自动读写 messages 表）
     """
     if session_id not in _session_memories:
+        # 使用自定义 ChatMessageHistory 自动从 messages 表加载/保存消息
+        chat_history = SQLiteChatMessageHistory(session_id=session_id)
+
         memory = ConversationSummaryBufferMemory(
             llm=_llm,
-            max_token_limit=20000,  # Token阈值：超过2000时自动摘要
+            chat_memory=chat_history,  # 传入自动管理消息的 chat_memory
+            max_token_limit=2000,      # Token阈值：超过2000时自动摘要
             return_messages=True,
             memory_key="chat_history"
         )
-        
-        print(f"[内存] 会话 {session_id[:8]}... 使用 SummaryBufferMemory")
-        
-        # 从数据库加载历史消息
-        messages = MessageManager.get_recent_messages(session_id, count=30)
-        print("加载历史消息")
-        for msg in messages:
-            if msg['role'] == 'user':
-                memory.chat_memory.add_user_message(msg['content'])
-            elif msg['role'] == 'ai':
-                memory.chat_memory.add_ai_message(msg['content'])
-        
+
+        print(f"[内存] 会话 {session_id[:8]}... 使用 SummaryBufferMemory + SQLiteChatMessageHistory")
+
         _session_memories[session_id] = memory
-    print("结束")
+
     return _session_memories[session_id]
 
 
@@ -80,15 +70,16 @@ def chat(user_text: str, session_id: Optional[str] = None, user_id: int = 1) -> 
     :return: AI回复文字
     """
     session_id = _get_or_create_session(session_id, user_id)
-    print("创建会话")
     memory = _get_or_create_memory(session_id, user_id)
-    print("创建记录")
-    # 保存用户消息到数据库
-    user_token_count = _estimate_tokens(user_text)
-    MessageManager.add_message(session_id, 'user', user_text, user_token_count)
-    print("使用上下文")
+
+    # SQLiteChatMessageHistory 会自动保存消息到 messages 表
+    # 这里只需要把用户消息加入 memory（用于计算 token 和生成摘要）
+    memory.chat_memory.add_message(HumanMessage(content=user_text))
+
     # 使用LangChain内存获取上下文（自动包含摘要+最近消息）
     chat_history = memory.load_memory_variables({})
+    print(f"[DEBUG] chat_history 消息数: {len(chat_history.get('chat_history', []))}")
+
     # 调用LLM
     response = _llm.invoke([
         SystemMessage(content=SYSTEM_PROMPT),
@@ -98,12 +89,10 @@ def chat(user_text: str, session_id: Optional[str] = None, user_id: int = 1) -> 
 
     print(response)
     reply = response.content
-    
-    # 保存AI回复到内存和数据库
-    memory.chat_memory.add_ai_message(reply)
-    ai_token_count = _estimate_tokens(reply)
-    MessageManager.add_message(session_id, 'ai', reply, ai_token_count)
-    
+
+    # 保存AI回复（SQLiteChatMessageHistory 会自动写入 messages 表）
+    memory.chat_memory.add_message(AIMessage(content=reply))
+
     # 如果是第一条AI回复，生成会话标题
     session = SessionManager.get_session(session_id)
     if session and session['message_count'] <= 2:
@@ -118,20 +107,18 @@ async def chat_stream_async(user_text: str, session_id: Optional[str] = None, us
     :param session_id: 会话ID
     :param user_id: 用户ID
     """
-    
+
     session_id = _get_or_create_session(session_id, user_id)
     memory = _get_or_create_memory(session_id, user_id)
-    print(user_text)
-    # 保存用户消息到数据库
-    user_token_count = _estimate_tokens(user_text)
 
-    MessageManager.add_message(session_id, 'user', user_text, user_token_count)
-    print(2)
+    # SQLiteChatMessageHistory 会自动保存消息到 messages 表
+    memory.chat_memory.add_message(HumanMessage(content=user_text))
+
     # 获取历史上下文（自动包含摘要+最近消息）
     chat_history = memory.load_memory_variables({})
-    
+
     full_reply = ""
-    
+
     print("开始调用")
     # 流式调用
     async for chunk in _llm.astream([
@@ -146,10 +133,8 @@ async def chat_stream_async(user_text: str, session_id: Optional[str] = None, us
             yield token
     
     print(full_reply)
-    # 保存AI回复到内存和数据库
-    memory.chat_memory.add_ai_message(full_reply)
-    ai_token_count = _estimate_tokens(full_reply)
-    MessageManager.add_message(session_id, 'ai', full_reply, ai_token_count)
+    # 保存AI回复（SQLiteChatMessageHistory 会自动写入 messages 表）
+    memory.chat_memory.add_message(AIMessage(content=full_reply))
     
     # 如果是第一条AI回复，生成会话标题
     session = SessionManager.get_session(session_id)
